@@ -56,8 +56,8 @@ $.fn.QiniuUploader = (options) ->
       pasteZone: dropPasteZone
       add: (e, data) ->
 
-        if onAdd
-          onAdd(e, data)
+        if settings.onAdd
+          settings.onAdd(e, data)
 
         file = data.files[0]
 
@@ -83,14 +83,14 @@ $.fn.QiniuUploader = (options) ->
         if data.context
           progress = parseInt(data.loaded / data.total * 100, 10)
           #data.context.find('.bar').css('width', progress + '%')
-          if onProgress
-              onProgress(progress)
+          if settings.onProgress
+              settings.onProgress(progress)
 
       done: (e, data) ->
         postData = buildCallbackData $uploadForm, data.files[0], data.result
 
-        if onSuccess
-          onSuccess(postData)
+        if settings.onSuccess
+          settings.onSuccess(postData)
 
         callbackUrl = $uploadForm.data('callback-url')
         if callbackUrl
@@ -110,9 +110,9 @@ $.fn.QiniuUploader = (options) ->
         $uploadForm.trigger("qiniu_upload_complete", [postData]) unless currentFiles.length
 
       fail: (e, data) ->
-        if onFailure
-          onFailure()
-          
+        if settings.onFailure
+          settings.onFailure()
+
         content = buildCallbackData $uploadForm, data.files[0], data.result
         content.errorThrown = data.errorThrown
 
