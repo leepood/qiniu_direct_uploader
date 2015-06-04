@@ -27,6 +27,10 @@ $.fn.QiniuUploader = (options) ->
     buttonId: undefined
     dropPasteZoneId: undefined
     allowMultipleFiles: true
+    onAdd: undefined
+    onProgress: undefined
+    onSuccess: undefined
+    onFailure: undefined
 
   $.extend settings, options
 
@@ -51,6 +55,10 @@ $.fn.QiniuUploader = (options) ->
       dropZone: dropPasteZone
       pasteZone: dropPasteZone
       add: (e, data) ->
+
+        if onAdd
+          onAdd(e, data)
+
         file = data.files[0]
 
         unless settings.onFilesAdd and not settings.onFilesAdd(file)
@@ -74,10 +82,16 @@ $.fn.QiniuUploader = (options) ->
       progress: (e, data) ->
         if data.context
           progress = parseInt(data.loaded / data.total * 100, 10)
-          data.context.find('.bar').css('width', progress + '%')
+          #data.context.find('.bar').css('width', progress + '%')
+          if onProgress
+              onProgress(progress)
 
       done: (e, data) ->
         postData = buildCallbackData $uploadForm, data.files[0], data.result
+
+        if onSuccess
+          onSuccess(postData)
+
         callbackUrl = $uploadForm.data('callback-url')
         if callbackUrl
           $.ajax
@@ -96,6 +110,9 @@ $.fn.QiniuUploader = (options) ->
         $uploadForm.trigger("qiniu_upload_complete", [postData]) unless currentFiles.length
 
       fail: (e, data) ->
+        if onFailure
+          onFailure()
+          
         content = buildCallbackData $uploadForm, data.files[0], data.result
         content.errorThrown = data.errorThrown
 
